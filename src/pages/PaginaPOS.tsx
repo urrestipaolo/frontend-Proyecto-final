@@ -5,22 +5,8 @@ import { usuariosService } from '../services/usuariosService';
 import { ApiUsuario } from '../types/usuarios';
 
 export const PaginaPOS: React.FC = () => {
-  const {
-    clienteId,
-    setClienteId,
-    metodoPago,
-    setMetodoPago,
-    items,
-    addItem,
-    updateQuantity,
-    removeItem,
-    clearPos,
-    checkout,
-    loading,
-    error,
-    successVenta,
+  const {clienteId,setClienteId,metodoPago,setMetodoPago,items,addItem,updateQuantity,removeItem,clearPos,checkout,loading,error,successVenta,
   } = usePosStore();
-
   const [productos, setProductos] = useState<Producto[]>([]);
   const [usuarios, setUsuarios] = useState<ApiUsuario[]>([]);
   const [searchProd, setSearchProd] = useState<string>('');

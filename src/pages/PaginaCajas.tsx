@@ -25,13 +25,10 @@ export const PaginaCajas: React.FC = () => {
     loadCajas();
   }, []);
 
-  // Manejador para ver detalles de la caja
   const handleView = (id: number) => {
     console.log('Ver detalle de caja ID:', id);
-    // Aquí puedes abrir tu modal de detalles si lo tienes
   };
 
-  // Manejador para editar el estado de la caja POS
   const handleEdit = async (id: number) => {
     const cajaActual = cajas.find((c) => c.id === id);
     const nuevoEstado = prompt(
@@ -46,7 +43,6 @@ export const PaginaCajas: React.FC = () => {
       alert('Caja actualizada con éxito');
       loadCajas();
     } catch (err: any) {
-      // 🔍 AQUÍ MOSTRAMOS EL ERROR REAL DEL BACKEND
       const mensajeBackend = err.response?.data?.message || err.message || 'Error desconocido';
       alert(`Error al actualizar la caja: ${mensajeBackend}`);
       console.error("Detalle del error:", err);

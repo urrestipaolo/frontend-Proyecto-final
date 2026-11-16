@@ -12,10 +12,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   const logout = useAuthStore((state) => state.logout);
   const usuarioId = useAuthStore((state) => state.usuarioId);
   const navigate = useNavigate();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Leemos el nombre y el avatar actual desde el localStorage
   const userName = localStorage.getItem('user_name') || 'Usuario';
   const avatarUrl = localStorage.getItem('user_avatar');
 
@@ -92,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearch }) => {
             >
               {avatarUrl ? (
                 <img 
-                  src={`http://localhost:3000${avatarUrl}`} 
+                  src={`https://proyecto-final-backend-jbj4.onrender.com/${avatarUrl}`} 
                   alt="Avatar" 
                   className="w-full h-full object-cover" 
                 />

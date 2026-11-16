@@ -25,8 +25,7 @@ export const PaginaVentas: React.FC = () => {
   useEffect(() => {
     loadVentas();
   }, []);
-
-  // Manejador para ver detalles
+  
   const handleView = (id: number) => {
     console.log('Ver detalle de venta ID:', id);
   };

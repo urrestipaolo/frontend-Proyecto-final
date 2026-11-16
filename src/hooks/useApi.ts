@@ -1,43 +1,53 @@
-//para que nos va servir la este hook? Podemos eliminar todo el codigo repetitivo de carga errores y llamada http como tal
+import { useState, useCallback } from 'react';
+import { api } from '../lib/axios';
+import { AxiosRequestConfig } from 'axios';
 
-import { useState, useEffect } from "react";
-
-interface UseApiResult<T> {
+interface UseApiResponse<T> {
   data: T | null;
-  cargando: boolean;
+  loading: boolean;
   error: string | null;
-  recargar: () => void;
+  request: (...args: any[]) => Promise<T | null>;
 }
 
-export function useApi<T>(fetchFn: () => Promise<T>): UseApiResult<T> {
+export function useApi<T = any>(url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET'): UseApiResponse<T> {
   const [data, setData] = useState<T | null>(null);
-  const [cargando, setCargando] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [contador, setContador] = useState(0);
 
-  useEffect(() => {
-    let cancelado = false;
-    setCargando(true);
-
-    fetchFn()
-      .then((result) => {
-        if (!cancelado) {
-          setData(result);
-          setError(null);
+  const request = useCallback(
+    async (body?: any, customConfig?: AxiosRequestConfig) => {
+      setLoading(true);
+      setError(null);
+      try {
+        let response;
+        switch (method) {
+          case 'GET':
+            response = await api.get<T>(url, customConfig);
+            break;
+          case 'POST':
+            response = await api.post<T>(url, body, customConfig);
+            break;
+          case 'PUT':
+            response = await api.put<T>(url, body, customConfig);
+            break;
+          case 'DELETE':
+            response = await api.delete<T>(url, customConfig);
+            break;
+          default:
+            throw new Error(`Método HTTP no soportado: ${method}`);
         }
-      })
-      .catch(() => {
-        if (!cancelado) {
-          setError("Error al cargar los datos");
-        }
-      })
-      .finally(() => {
-        if (!cancelado) setCargando(false);
-      });
-    return () => {
-      cancelado = true;
-    };
-  }, [contador]);
+        setData(response.data);
+        return response.data;
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.message || 'Ocurrió un error inesperado';
+        setError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [url, method]
+  );
 
-  return { data, cargando, error, recargar: () => setContador((c) => c + 1) };
+  return { data, loading, error, request };
 }

@@ -1,98 +1,53 @@
-import { useEffect } from "react";
-import { AuthPage } from "./componentes/AuthPage";
-import { PaginaCatalogo } from "./pages/PaginaCatalogo";
-import { useAuthStore } from "./store/useAuthStore";
-import { PaginaReportes } from "./pages/PaginaReportes";
-import { Routes, Route, NavLink } from "react-router-dom";
 import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import { MainLayout } from "./componentes/Layout";
+import { PaginaProductos } from "./pages/PaginaProductos";
+import { PaginaLogin } from "./pages/PaginaLogin";
+import { RutaProtegida } from "./componentes/login/RutaProtegida";
+import { PaginaVentas } from "./pages/PaginaVentas";
+import { PaginaCajas } from "./pages/PaginaCajas";
+import { PaginaCarritos } from "./pages/PaginaCarritos";
+import { PaginaUsuarios } from "./pages/PaginasUsuarios";
+import { PaginaPOS } from "./pages/PaginaPOS";
+import { PaginaClienteCarrito } from "./pages/PaginaClienteCarrito";
+import { PaginaClienteCatalogo } from "./pages/PaginaClienteCatalogo";
 
 function App() {
-  const autenticado = useAuthStore((s) => s.autenticado);
-  const verificandoSesion = useAuthStore((s) => s.verificandoSesion);
-  const usuarioNombre = useAuthStore((s) => s.usuarioNombre);
-  const usuarioRol = useAuthStore((s) => s.usuarioRol);
-  const mostrarAuth = useAuthStore((s) => s.mostrarAuth);
-  const verificarSesion = useAuthStore((s) => s.verificarSesion);
-  const logout = useAuthStore((s) => s.logout);
-  const abrirAuth = useAuthStore((s) => s.abrirAuth);
-  const cerrarAuth = useAuthStore((s) => s.cerrarAuth);
-  const esAdmin = useAuthStore((s) => s.esAdmin());
-
-  useEffect(() => {
-    void verificarSesion();
-  }, [verificarSesion]);
-
   return (
-    <>
-      <header className="session-bar">
-        <div className="brand">
-          <div>
-            <p className="brand-title">Tienda Online</p>
-            <p className="brand-subtitle">Tienda de prodcutos varios</p>
-          </div>
-        </div>
+    <Routes>
+      <Route path="/login" element={<PaginaLogin />} />
 
-        <nav className="main-nav" aria-label="Navegación principal">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `button ${isActive ? "primary" : "secondary"}`
-            }
-          >
-            Catálogo
-          </NavLink>
+      <Route element={<MainLayout />}>
+        
+        <Route element={<RutaProtegida allowedRoles={[1, 2, 3]} />}>
+          <Route path="/" element={
+            <div className="p-8">
+              <h1 className="text-2xl font-bold text-on-surface">Bienvenido al Dashboard</h1>
+              <p className="text-on-surface-variant mt-2">Selecciona una opción en el menú lateral.</p>
+            </div>
+          } />
+          <Route path="/productos" element={<PaginaProductos />} />
+        </Route>
 
-          {esAdmin && (
-            <NavLink
-              to="/reportes"
-              className={({ isActive }) =>
-                `button ${isActive ? "primary" : "secondary"}`
-              }
-            >
-              Reportes
-            </NavLink>
-          )}
-        </nav>
 
-        <div className="session-actions">
-          {autenticado ? (
-            <>
-              <div className="user-info">
-                <strong>{usuarioNombre || "Usuario"}</strong>
-                <span>{usuarioRol || "Cliente"}</span>
-              </div>
-              <button
-                type="button"
-                className="button secondary"
-                onClick={logout}
-              >
-                Cerrar sesión
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              className="button primary"
-              onClick={abrirAuth}
-            >
-              Iniciar sesión
-            </button>
-          )}
-        </div>
-      </header>
-      {verificandoSesion ? (
-        <p className="empty app-loading">Verificando sesión...</p>
-      ) : (
-        <>
-          <Routes>
-            <Route path="/" element={<PaginaCatalogo />} />
-            {esAdmin && <Route path="/reportes" element={<PaginaReportes />} />}
-          </Routes>
+        <Route element={<RutaProtegida allowedRoles={[1, 2]} />}>
+          <Route path="/ventas" element={<PaginaVentas />} />
+          <Route path="/cajas" element={<PaginaCajas />} />
+          <Route path="/pos" element={<PaginaPOS />} />
+        </Route>
 
-          {mostrarAuth && !autenticado && <AuthPage onCancel={cerrarAuth} />}
-        </>
-      )}
-    </>
+        <Route element={<RutaProtegida allowedRoles={[1]} />}>
+          <Route path="/carrito" element={<PaginaCarritos />} />
+          <Route path="/users" element={<PaginaUsuarios />} />
+        </Route>
+
+        <Route element={<RutaProtegida allowedRoles={[3]} />}>
+          <Route path="/micarrito" element={<PaginaClienteCarrito />} />
+          <Route path="/catalogo" element={<PaginaClienteCatalogo />} />
+        </Route>
+
+      </Route>
+    </Routes>
   );
 }
 
